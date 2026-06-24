@@ -31,6 +31,13 @@ ok()    { echo -e "${GREEN}✓${NC} $*"; }
 warn()  { echo -e "${YELLOW}!${NC} $*"; }
 fail()  { echo -e "${RED}✗${NC} $*" >&2; exit 1; }
 
+ensure_git_safe_dir() {
+  if git config --global --get-all safe.directory 2>/dev/null | grep -Fxq "$INSTALL_DIR"; then
+    return 0
+  fi
+  git config --global --add safe.directory "$INSTALL_DIR"
+}
+
 # ── Caminhos ──────────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -190,6 +197,9 @@ chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
 PARENT_DIR="$(dirname "$INSTALL_DIR")"
 if [[ "$PARENT_DIR" == /home/* && -d "$PARENT_DIR" ]]; then
   chmod o+x "$PARENT_DIR" 2>/dev/null || true
+fi
+if [[ -d "$INSTALL_DIR/.git" ]]; then
+  ensure_git_safe_dir
 fi
 ok "Permissões ok"
 

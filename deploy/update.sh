@@ -24,6 +24,13 @@ log() {
   echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"
 }
 
+ensure_git_safe_dir() {
+  if git config --global --get-all safe.directory 2>/dev/null | grep -Fxq "$INSTALL_DIR"; then
+    return 0
+  fi
+  git config --global --add safe.directory "$INSTALL_DIR"
+}
+
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
   echo "Execute com sudo: sudo bash deploy/update.sh" >&2
   exit 1
@@ -43,6 +50,7 @@ NPM_BIN="$(command -v npm)"
 NPM_CACHE="${INSTALL_DIR}/.npm-cache"
 
 cd "$INSTALL_DIR"
+ensure_git_safe_dir
 
 BEFORE="$(git rev-parse HEAD)"
 log "git fetch origin ${GIT_BRANCH}..."
