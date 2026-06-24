@@ -1,6 +1,7 @@
 import type { GroupState, StandingRow } from './tournament'
 import type { SimulatedBracket, SimulatedMatch } from './bracketSimulation'
 import { R32_TEMPLATE } from './bracketPaths'
+import { computeMirrorLayout, isGroupPhaseComplete } from './mirrorBracket'
 
 export interface PositionedGroup {
   group: string
@@ -20,6 +21,8 @@ export interface PositionedNode {
   w: number
   h: number
   slot?: 'home' | 'away'
+  side?: 'left' | 'right' | 'center'
+  roundStage?: string
 }
 
 export interface ConnectorPort {
@@ -45,9 +48,16 @@ export interface BracketConnector {
 }
 
 export interface UnifiedLayout {
+  mode: 'unified' | 'mirror'
   groups: PositionedGroup[]
   knockoutNodes: PositionedNode[]
-  knockoutRounds: { stage: string; label: string; x: number; matches: SimulatedMatch[] }[]
+  knockoutRounds: {
+    stage: string
+    label: string
+    x: number
+    matches: SimulatedMatch[]
+    mirrorRightX?: number
+  }[]
   connectors: BracketConnector[]
   ports: ConnectorPort[]
   width: number
@@ -55,12 +65,14 @@ export interface UnifiedLayout {
   knockoutStartX: number
 }
 
-export const GROUP_W = 520
-export const PLAYED_ROW_H = 58
-export const UPCOMING_ROW_H = 34
+export const GROUP_W = 480
+export const GROUP_COL_GAP = 28
+export const GROUPS_PER_COL = 6
+export const PLAYED_ROW_H = 68
+export const UPCOMING_ROW_H = 40
 export const GROUP_HEADER_H = 36
 export const STANDINGS_H = 108
-export const GROUP_GAP_Y = 64
+export const GROUP_GAP_Y = 40
 export const KNOCKOUT_MATCH_W = 280
 export const KNOCKOUT_MATCH_H = 76
 export const KNOCKOUT_ROUND_GAP = 140
@@ -129,39 +141,53 @@ function forkPath(
   ].join(' ')
 }
 
+export function computeBracketLayout(
+  groups: GroupState[],
+  bracket: SimulatedBracket,
+): UnifiedLayout {
+  if (isGroupPhaseComplete(groups)) {
+    return computeMirrorLayout(bracket)
+  }
+  return computeUnifiedLayout(groups, bracket)
+}
+
 export function computeUnifiedLayout(
   groups: GroupState[],
   bracket: SimulatedBracket,
 ): UnifiedLayout {
   const sorted = [...groups].sort((a, b) => a.group.localeCompare(b.group))
 
-  let groupY = HEADER_H + 8
-  const positionedGroups: PositionedGroup[] = sorted.map((g) => {
+  const colY = [HEADER_H + 8, HEADER_H + 8]
+  const positionedGroups: PositionedGroup[] = sorted.map((g, index) => {
+    const col = index < GROUPS_PER_COL ? 0 : 1
     const h = groupHeight(g)
+    const y = colY[col]
+    const x = col * (GROUP_W + GROUP_COL_GAP)
     const qualifierPortY: Record<string, number> = {}
     g.standings.slice(0, 3).forEach((s, i) => {
-      qualifierPortY[s.teamId] = groupY + h - 28 - (2 - i) * 28
+      qualifierPortY[s.teamId] = y + h - 28 - (2 - i) * 28
     })
     const positioned = {
       group: g.group,
-      x: 0,
-      y: groupY,
+      x,
+      y,
       width: GROUP_W,
       height: h,
       matches: g.matches,
       standings: g.standings,
       qualifierPortY,
     }
-    groupY += h + GROUP_GAP_Y
+    colY[col] += h + GROUP_GAP_Y
     return positioned
   })
 
-  const groupsTotalH = groupY
+  const groupsTotalH = Math.max(colY[0], colY[1])
+  const groupsTotalW = GROUP_W * 2 + GROUP_COL_GAP
   const r32Count = bracket.rounds[0]?.matches.length ?? 16
   const knockoutHeight = r32Count * KO_UNIT + HEADER_H
   const totalH = Math.max(groupsTotalH, knockoutHeight + 80)
 
-  const knockoutStartX = GROUP_W + CONNECTOR_ZONE_W + GROUP_TO_KO_GAP
+  const knockoutStartX = groupsTotalW + CONNECTOR_ZONE_W + GROUP_TO_KO_GAP
   const slots = buildSlots(sorted)
   const ports: ConnectorPort[] = []
   const knockoutNodes: PositionedNode[] = []
@@ -205,7 +231,7 @@ export function computeUnifiedLayout(
       const portY = grp.qualifierPortY[teamId]
       if (!portY) continue
 
-      const portX = GROUP_W
+      const portX = grp.x + grp.width
       const portId = `port-${r32Id}-${side === 0 ? 'h' : 'a'}`
       ports.push({
         id: portId,
@@ -218,6 +244,7 @@ export function computeUnifiedLayout(
 
       const endY = target.y + KNOCKOUT_MATCH_H * (side === 0 ? 0.3 : 0.7)
       const endX = target.x
+      const bendX = groupsTotalW + CONNECTOR_ZONE_W * 0.35
 
       connectors.push({
         id: `link-${token}-${r32Id}-${side}`,
@@ -231,7 +258,7 @@ export function computeUnifiedLayout(
         played: grp.matches.some(
           (m) => (m.homeId === teamId || m.awayId === teamId) && isPlayed(m),
         ),
-        path: `M ${portX} ${portY} H ${GROUP_W + CONNECTOR_ZONE_W * 0.35} V ${endY} H ${endX}`,
+        path: `M ${portX} ${portY} H ${bendX} V ${endY} H ${endX}`,
       })
     }
   })
@@ -266,6 +293,7 @@ export function computeUnifiedLayout(
   const totalW = knockoutStartX + bracket.rounds.length * KNOCKOUT_COL_W + 80
 
   return {
+    mode: 'unified',
     groups: positionedGroups,
     knockoutNodes,
     knockoutRounds,

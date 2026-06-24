@@ -4,11 +4,24 @@ import { ratingColor, shortPlayerName } from '../lib/matchPerformance'
 interface MatchPerformanceLinesProps {
   performance: MatchPerformance
   compact?: boolean
+  bracket?: boolean
 }
 
-export function MatchPerformanceLines({ performance, compact = false }: MatchPerformanceLinesProps) {
+export function MatchPerformanceLines({ performance, compact = false, bracket = false }: MatchPerformanceLinesProps) {
   const { home, away, projected } = performance
   const textSize = compact ? 'text-[7px]' : 'text-[9px]'
+
+  if (bracket) {
+    return (
+      <div className={`${textSize} leading-snug border-t border-border-subtle/60 grid grid-cols-2 gap-x-1 px-1 py-0.5`}>
+        {projected && (
+          <div className="col-span-2 text-text-tertiary italic text-center">Jogadores-chave (projeção)</div>
+        )}
+        <SidePerf side={home} align="right" projected={projected} />
+        <SidePerf side={away} align="left" projected={projected} />
+      </div>
+    )
+  }
 
   return (
     <div className={`${textSize} leading-snug px-1 py-0.5 border-t border-border-subtle/60 space-y-0.5`}>

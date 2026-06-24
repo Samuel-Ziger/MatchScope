@@ -12,6 +12,7 @@ interface BracketViewportProps {
   layoutWidth: number
   layoutHeight: number
   children: ReactNode
+  defaultZoom?: number
 }
 
 interface ViewportState {
@@ -34,10 +35,10 @@ function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v))
 }
 
-export function BracketViewport({ layoutWidth, layoutHeight, children }: BracketViewportProps) {
+export function BracketViewport({ layoutWidth, layoutHeight, children, defaultZoom }: BracketViewportProps) {
   const shellRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM)
+  const [zoom, setZoom] = useState(defaultZoom ?? DEFAULT_ZOOM)
   const [pan, setPan] = useState({ x: 24, y: 24 })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPanning, setIsPanning] = useState(false)

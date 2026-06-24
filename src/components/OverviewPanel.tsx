@@ -3,16 +3,29 @@ import { DATA_LAST_UPDATED } from '../data/teams'
 import { DATA_SOURCES } from '../data/sources'
 import { Card, KpiCard, SectionHeader, Flag } from './ui'
 import { formatPct } from '../lib/simulation'
+import { useTournament } from '../context/TournamentContext'
+import { BRACKET_MC_ITERATIONS } from '../lib/bracketSimulation'
 
 interface OverviewPanelProps {
   teams: Team[]
 }
 
 export function OverviewPanel({ teams }: OverviewPanelProps) {
-  const top5 = [...teams].sort((a, b) => b.market.aggregate - a.market.aggregate).slice(0, 5)
-  const leader = top5[0]
+  const { state } = useTournament()
+  const modelProbs = state.simulatedBracket.championProbabilities
+
+  const modelTop5 = modelProbs
+    .slice(0, 5)
+    .map((entry) => {
+      const team = teams.find((t) => t.id === entry.teamId)
+      return team ? { team, modelProb: entry.prob } : null
+    })
+    .filter((x): x is { team: Team; modelProb: number } => !!x)
+
+  const leader = modelTop5[0]
+  const marketLeader = [...teams].sort((a, b) => b.market.aggregate - a.market.aggregate)[0]
+  const momentumLeader = [...teams].sort((a, b) => b.market.momentum24h - a.market.momentum24h)[0]
   const volumeHelp = DATA_SOURCES.market.volume24h.help
-  const openContenders = teams.filter((t) => t.market.aggregate >= 1).length
 
   return (
     <div className="space-y-6 animate-enter w-full min-w-0">
@@ -22,20 +35,25 @@ export function OverviewPanel({ teams }: OverviewPanelProps) {
             Probabilidades de Título
           </h2>
           <p className="text-sm text-text-secondary mt-1">
-            Dados agregados de mercados de previsão · Atualizado em {DATA_LAST_UPDATED}
+            Modelo da chave (Elo + forma + Monte Carlo {BRACKET_MC_ITERATIONS.toLocaleString('pt-BR')}×) · Mercado em comparação
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-text-tertiary">
           <span className="w-2 h-2 rounded-full bg-positive animate-pulse" />
-          Mercados ativos
+          Atualizado com {state.played}/{state.total} jogos de grupo
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard
-          label="Favorito"
-          value={leader.name}
-          sublabel={formatPct(leader.market.aggregate)}
+          label="Favorito (modelo)"
+          value={leader?.team.name ?? '—'}
+          sublabel={leader ? formatPct(leader.modelProb) : '—'}
+        />
+        <KpiCard
+          label="Favorito (mercado)"
+          value={marketLeader?.name ?? '—'}
+          sublabel={marketLeader ? formatPct(marketLeader.market.aggregate) : '—'}
         />
         <KpiCard
           label="Volume 24h"
@@ -56,20 +74,15 @@ export function OverviewPanel({ teams }: OverviewPanelProps) {
           }}
         />
         <KpiCard
-          label="Contenders"
-          value={String(openContenders)}
-          sublabel="≥ 1% prob. título"
-        />
-        <KpiCard
           label="Maior momentum"
-          value="Argentina"
+          value={momentumLeader?.name ?? '—'}
           sublabel="24 horas"
-          trend={1.4}
+          trend={momentumLeader?.market.momentum24h}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        {top5.map((team, i) => (
+        {modelTop5.map(({ team, modelProb }, i) => (
           <Card key={team.id} padding="sm" className={i === 0 ? 'border-brand/30' : ''}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-mono text-text-tertiary">#{i + 1}</span>
@@ -84,13 +97,18 @@ export function OverviewPanel({ teams }: OverviewPanelProps) {
                 <div className="text-[11px] text-text-tertiary">Grupo {team.group}</div>
               </div>
             </div>
-            <div className="text-2xl font-mono font-semibold text-text-primary mb-1">
-              {formatPct(team.market.aggregate)}
+            <div className="text-2xl font-mono font-semibold text-text-primary mb-0.5">
+              {formatPct(modelProb)}
+            </div>
+            <div className="text-[11px] text-text-tertiary mb-3">
+              Mercado: {formatPct(team.market.aggregate)}
             </div>
             <div className="h-1 bg-surface-3 rounded-full overflow-hidden mb-3">
               <div
                 className="h-full bg-brand rounded-full"
-                style={{ width: `${(team.market.aggregate / top5[0].market.aggregate) * 100}%` }}
+                style={{
+                  width: `${modelTop5[0] ? (modelProb / modelTop5[0].modelProb) * 100 : 0}%`,
+                }}
               />
             </div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
@@ -109,21 +127,31 @@ export function OverviewPanel({ teams }: OverviewPanelProps) {
 
       <Card>
         <SectionHeader
-          title="Resumo do mercado"
-          description="A França consolidou a liderança após vitórias convincentes na fase de grupos. Argentina subiu com +1,4% em 24h após desempenho de Messi. Espanha recuou levemente após empate com Cabo Verde, mas reagiu com 4-0 sobre Arábia Saudita."
+          title="Modelo vs mercado"
+          description={
+            leader && marketLeader && leader.team.id !== marketLeader.id
+              ? `${leader.team.name} lidera no modelo da chave (${formatPct(leader.modelProb)}), enquanto o mercado aponta ${marketLeader.name} (${formatPct(marketLeader.market.aggregate)}). O modelo considera o caminho real da Copa — grupos, 32 avos e confrontos projetados — além de Elo e forma recente.`
+              : `Modelo e mercado convergem em ${leader?.team.name ?? '—'} como principal favorito. O modelo simula a chave completa com ${BRACKET_MC_ITERATIONS.toLocaleString('pt-BR')} iterações Monte Carlo.`
+          }
         />
         <div className="grid sm:grid-cols-3 gap-4 text-sm">
           <div className="border-l-2 border-brand pl-3">
-            <div className="text-text-tertiary text-xs mb-1">Tendência</div>
-            <div className="text-text-primary">Mercado sem favorito absoluto — margens estreitas entre top 4</div>
+            <div className="text-text-tertiary text-xs mb-1">Modelo da chave</div>
+            <div className="text-text-primary">
+              Mesma engine do mapa interativo — classificação, chave FIFA e mata-mata simulado
+            </div>
           </div>
           <div className="border-l-2 border-positive pl-3">
-            <div className="text-text-tertiary text-xs mb-1">Surpresa positiva</div>
-            <div className="text-text-primary">EUA triplicaram probabilidade desde o pré-torneio (1,6% → 4,1%)</div>
+            <div className="text-text-tertiary text-xs mb-1">Mercado</div>
+            <div className="text-text-primary">
+              Odds agregadas (Kalshi + Polymarket) na aba Probabilidades — reflete apostas, não o caminho da chave
+            </div>
           </div>
           <div className="border-l-2 border-warning pl-3">
-            <div className="text-text-tertiary text-xs mb-1">Formato 48 times</div>
-            <div className="text-text-primary">Mais seleções nas oitavas aumentam chance de zebras no mata-mata</div>
+            <div className="text-text-tertiary text-xs mb-1">Dados base</div>
+            <div className="text-text-primary">
+              Seleções e mercado: {DATA_LAST_UPDATED} · Jogos: {state.played}/{state.total} com resultado
+            </div>
           </div>
         </div>
       </Card>

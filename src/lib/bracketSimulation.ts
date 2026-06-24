@@ -113,8 +113,14 @@ export function projectGroupMatches(
   })
 }
 
-function sampleKoWinner(home: Team, away: Team, random: boolean): { winnerId: string; prob: number } {
-  const p = eloWinProb(home.elo, away.elo)
+function sampleKoWinner(
+  home: Team,
+  away: Team,
+  random: boolean,
+  formH: number,
+  formA: number,
+): { winnerId: string; prob: number } {
+  const p = eloWinProb(home.elo + formH, away.elo + formA)
   const winnerId = random ? (Math.random() < p ? home.id : away.id) : (p >= 0.5 ? home.id : away.id)
   const prob = winnerId === home.id ? p * 100 : (1 - p) * 100
   return { winnerId, prob }
@@ -148,9 +154,11 @@ function enrichKoMatch(
   let winnerAdvanceProb = 50
 
   if (home && away) {
-    const kp = getKnockoutWinProbability(home, away, getForm(home.id), getForm(away.id))
+    const formH = getForm(home.id)
+    const formA = getForm(away.id)
+    const kp = getKnockoutWinProbability(home, away, formH, formA)
     knockoutProbs = { home: kp.teamA, away: kp.teamB }
-    const pick = sampleKoWinner(home, away, random)
+    const pick = sampleKoWinner(home, away, random, formH, formA)
     projectedWinnerId = pick.winnerId
     winnerAdvanceProb = pick.prob
   }
@@ -263,12 +271,14 @@ export function buildSimulatedBracket(
   return { rounds, championId, championProb, championProbabilities: [] }
 }
 
+export const BRACKET_MC_ITERATIONS = 5000
+
 export function runBracketMonteCarlo(
   matches: TournamentMatch[],
   teams: Team[],
   perfMap: Map<string, MatchPerformance>,
   formCache: Map<string, number>,
-  iterations = 2500,
+  iterations = BRACKET_MC_ITERATIONS,
 ): { teamId: string; prob: number }[] {
   const counts: Record<string, number> = {}
 
@@ -290,10 +300,11 @@ export function buildFullSimulatedBracket(
   formCache: Map<string, number>,
 ): SimulatedBracket {
   const deterministic = buildSimulatedBracket(matches, teams, perfMap, formCache, false)
-  const championProbabilities = runBracketMonteCarlo(matches, teams, perfMap, formCache, 2500)
+  const championProbabilities = runBracketMonteCarlo(matches, teams, perfMap, formCache)
   const top = championProbabilities[0]
   return {
     ...deterministic,
+    championId: top?.teamId ?? deterministic.championId,
     championProb: top?.prob ?? deterministic.championProb,
     championProbabilities,
   }
