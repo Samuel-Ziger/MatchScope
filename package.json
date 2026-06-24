@@ -10,6 +10,7 @@
     "start": "node server/index.mjs",
     "fetch-odds": "node server/fetch-odds.mjs",
     "pull-worldcup": "node server/pull-worldcup.mjs",
+    "enrich-matches": "node server/enrich-matches.mjs",
     "export-catalog": "node server/export-match-catalog.mjs"
   },
   "dependencies": {

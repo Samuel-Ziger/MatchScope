@@ -3,8 +3,8 @@ export const DATA_SOURCES = {
   lastUpdatedLabel: '23 de junho de 2026, 10:29 PDT',
 
   market: {
-    name: 'The Odds API',
-    description: 'Probabilidades de vencedor da Copa (mercado outrights) agregadas de casas esportivas US e EU. Atualização automática via cron na VPS: 08h, 14h, 20h e 02h (horário do servidor).',
+    name: 'The Odds API + mercados de previsão',
+    description: 'Probabilidade de título: média entre The Odds API (casas esportivas ao vivo), Kalshi e Polymarket (snapshot DeFi Rate, jun/2026). Atualização da Odds API via cron na VPS.',
     urls: [
       { label: 'The Odds API', url: 'https://the-odds-api.com/' },
       { label: 'Dashboard', url: 'https://dash.the-odds-api.com/' },
@@ -38,8 +38,8 @@ export const DATA_SOURCES = {
   },
 
   tournament: {
-    name: 'openfootball / worldcup.json',
-    description: 'Calendário e resultados da Copa 2026 — dados públicos em JSON, sem API key.',
+    name: 'openfootball + football-data + API-Football',
+    description: 'Placares da Copa 2026 em camadas: openfootball (base), football-data.org (validação) e API-Football (ao vivo, prioridade máxima).',
     urls: [
       { label: 'worldcup.json', url: 'https://github.com/openfootball/worldcup.json' },
       { label: 'JSON 2026', url: 'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json' },
@@ -61,10 +61,34 @@ export const DATA_SOURCES = {
       dashboard: 'https://github.com/openfootball/worldcup.json/tree/master/2026',
     },
     {
+      id: 'football-data',
+      name: 'football-data.org',
+      provider: 'football-data.org',
+      purpose: 'Validação cruzada de placares e jogos ao vivo (API oficial)',
+      endpoint: 'GET /v4/competitions/WC/matches',
+      params: 'season=2026 · plano free: 10 req/min',
+      schedule: 'Com openfootball — a cada 10 min (enrich na VPS)',
+      trigger: 'Automático + botão Atualizar (camada sobre openfootball)',
+      docs: 'https://www.football-data.org/documentation/quickstart',
+      dashboard: 'https://www.football-data.org/client/register',
+    },
+    {
+      id: 'api-football',
+      name: 'API-Football',
+      provider: 'api-sports.io',
+      purpose: 'Placares ao vivo, eventos e artilheiros (prioridade máxima)',
+      endpoint: 'GET /fixtures?live=all · /fixtures?date=',
+      params: 'league=WC · complementa openfootball e football-data',
+      schedule: 'Com openfootball — a cada 10 min (enrich na VPS)',
+      trigger: 'Automático + botão Atualizar (prioridade sobre outras fontes)',
+      docs: 'https://www.api-football.com/documentation-v3',
+      dashboard: 'https://dashboard.api-football.com/',
+    },
+    {
       id: 'the-odds-api',
       name: 'The Odds API',
       provider: 'the-odds-api.com',
-      purpose: 'Probabilidades de título (mercado outrights)',
+      purpose: 'Probabilidades de título — média com Kalshi/Polymarket (referência)',
       endpoint: 'GET /v4/sports/soccer_fifa_world_cup_winner/odds',
       params: 'regions=us,eu · markets=outrights · oddsFormat=decimal',
       schedule: '4× ao dia (08h, 14h, 20h, 02h)',

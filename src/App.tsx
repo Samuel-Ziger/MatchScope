@@ -51,7 +51,7 @@ function AppContent() {
 
       <footer className="border-t border-border mt-auto overflow-x-clip">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-text-tertiary text-center sm:text-left">
-          <span className="break-words max-w-full">MatchScope · Odds: The Odds API · Jogos: openfootball</span>
+          <span className="break-words max-w-full">MatchScope · Odds: The Odds API + Kalshi/Poly · Jogos: openfootball + football-data + API-Football</span>
           <span className="break-words max-w-full shrink-0">
             Dados base: {DATA_LAST_UPDATED}
             {oddsLastUpdated && (

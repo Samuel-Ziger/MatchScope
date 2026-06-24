@@ -8,6 +8,8 @@ import {
   fetchMatchesSync,
   MATCHES_POLL_MS,
 } from '../lib/openfootball/load'
+import { syncMatchesFromAllSources } from '../lib/matchSync/merge'
+import { shouldAutoSync } from '../lib/matchSync'
 import type { SyncResult } from '../lib/apiFootball/types'
 
 interface TournamentContextValue {
@@ -22,6 +24,8 @@ interface TournamentContextValue {
 }
 
 const TournamentContext = createContext<TournamentContextValue | null>(null)
+
+const API_SYNC_MS = 15 * 60_000
 
 export function TournamentProvider({ children }: { children: ReactNode }) {
   const { teams } = useTeams()
@@ -47,64 +51,82 @@ export function TournamentProvider({ children }: { children: ReactNode }) {
     setLastUpdate(Date.now())
   }, [persist])
 
-  const loadFromOpenFootball = useCallback(async (): Promise<SyncResult> => {
-    const sync = await fetchMatchesSync()
-    if (!sync) {
-      return {
-        ok: false,
-        updated: 0,
-        live: 0,
-        requestsUsed: 0,
-        message: 'Dados openfootball indisponíveis — aguarde o próximo pull na VPS',
-        syncedAt: new Date().toISOString(),
+  const runFullSync = useCallback(
+    async (forceApis: boolean): Promise<SyncResult> => {
+      const openFootball = await fetchMatchesSync()
+      if (openFootball?.updatedAt) setMatchesLastSync(openFootball.updatedAt)
+
+      if (!forceApis && !shouldAutoSync()) {
+        if (!openFootball) {
+          return {
+            ok: false,
+            updated: 0,
+            live: 0,
+            requestsUsed: 0,
+            message: 'Dados indisponíveis — aguarde o cron na VPS',
+            syncedAt: new Date().toISOString(),
+          }
+        }
+        const next = applyMatchesSync([...GROUP_MATCHES], openFootball)
+        applySyncedMatches(next)
+        const withScore = openFootball.stats?.withScore ?? Object.keys(openFootball.results).length
+        return {
+          ok: true,
+          updated: withScore,
+          live: 0,
+          requestsUsed: 0,
+          message: `${withScore} jogo(s) via openfootball (APIs ao vivo na próxima janela)`,
+          syncedAt: openFootball.updatedAt,
+        }
       }
-    }
 
-    const next = applyMatchesSync([...GROUP_MATCHES], sync)
-    applySyncedMatches(next)
-    setMatchesLastSync(sync.updatedAt)
-
-    const withScore = sync.stats?.withScore ?? Object.keys(sync.results).length
-    return {
-      ok: true,
-      updated: withScore,
-      live: 0,
-      requestsUsed: 0,
-      message: `${withScore} jogo(s) com placar via openfootball/worldcup.json`,
-      syncedAt: sync.updatedAt,
-    }
-  }, [applySyncedMatches])
+      const { matches: next, result } = await syncMatchesFromAllSources([...GROUP_MATCHES], openFootball)
+      applySyncedMatches(next)
+      return result
+    },
+    [applySyncedMatches],
+  )
 
   const atualizar = useCallback(async (): Promise<SyncResult> => {
     setSyncing(true)
     try {
-      const result = await loadFromOpenFootball()
+      const result = await runFullSync(true)
       setSyncStatus(result)
       return result
     } finally {
       setSyncing(false)
     }
-  }, [loadFromOpenFootball])
+  }, [runFullSync])
 
   useEffect(() => {
     void (async () => {
       setSyncing(true)
       try {
-        const result = await loadFromOpenFootball()
+        const result = await runFullSync(true)
         if (result.ok) setSyncStatus(result)
       } finally {
         setSyncing(false)
       }
     })()
 
-    const id = window.setInterval(() => {
-      void loadFromOpenFootball().then((result) => {
+    const openFootballId = window.setInterval(() => {
+      void runFullSync(false).then((result) => {
         if (result.ok) setSyncStatus(result)
       })
     }, MATCHES_POLL_MS)
 
-    return () => window.clearInterval(id)
-  }, [loadFromOpenFootball])
+    const apiId = window.setInterval(() => {
+      if (!shouldAutoSync()) return
+      void runFullSync(true).then((result) => {
+        if (result.ok) setSyncStatus(result)
+      })
+    }, API_SYNC_MS)
+
+    return () => {
+      window.clearInterval(openFootballId)
+      window.clearInterval(apiId)
+    }
+  }, [runFullSync])
 
   const updateResult = useCallback((matchId: string, homeScore: number, awayScore: number) => {
     setMatches((prev) => {

@@ -98,7 +98,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3 w-10">#</th>
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3">Seleção</th>
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3">Grp</th>
-                <Th label="Título (agg)" sort="aggregate" />
+                <Th label="Título (mix)" sort="aggregate" />
                 <th className="hidden md:table-cell text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3 cursor-pointer hover:text-text-secondary select-none whitespace-nowrap" onClick={() => toggleSort('kalshi')}>
                   Kalshi{sortKey === 'kalshi' && <span className="ml-1 text-brand">{sortAsc ? '↑' : '↓'}</span>}
                 </th>
@@ -174,7 +174,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
       </div>
 
       <p className="text-xs text-text-tertiary mt-3">
-        {sorted.length} seleções · Probabilidades agregadas Kalshi + Polymarket
+        {sorted.length} seleções · Título: média Odds API + Kalshi + Polymarket · Grupo/oitavas: referência DeFi Rate
         <span className="md:hidden"> · deslize a tabela para ver mais colunas</span>
       </p>
     </div>

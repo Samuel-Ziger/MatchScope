@@ -82,6 +82,7 @@ async function main() {
     year: YEAR,
     gitCommit: commit,
     fetchMode: source,
+    sources: ['openfootball'],
     results,
     goals,
     stats,
@@ -93,6 +94,20 @@ async function main() {
   )
   if (stats.unmatched > 0) {
     console.warn(`Aviso: ${stats.unmatched} jogos não pareados`, stats.unmatchedSamples)
+  }
+
+  try {
+    const { spawnSync } = await import('node:child_process')
+    const enrich = spawnSync(process.execPath, [join(__dirname, 'enrich-matches.mjs')], {
+      cwd: ROOT,
+      stdio: 'inherit',
+      env: process.env,
+    })
+    if (enrich.status !== 0) {
+      console.warn('enrich-matches falhou — placares openfootball mantidos')
+    }
+  } catch (err) {
+    console.warn(`enrich-matches: ${err.message}`)
   }
 }
 
