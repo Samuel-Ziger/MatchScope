@@ -64,6 +64,12 @@ git pull --ff-only origin "$GIT_BRANCH"
 AFTER="$(git rev-parse HEAD)"
 log "Atualizado ${BEFORE:0:7} → ${AFTER:0:7}"
 
+chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+PARENT_DIR="$(dirname "$INSTALL_DIR")"
+if [[ "$PARENT_DIR" == /home/* && -d "$PARENT_DIR" ]]; then
+  chmod o+x "$PARENT_DIR" 2>/dev/null || true
+fi
+
 mkdir -p "$NPM_CACHE"
 chown "$SERVICE_USER:$SERVICE_USER" "$NPM_CACHE"
 

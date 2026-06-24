@@ -129,7 +129,7 @@ if [[ -n "$GIT_REPO" ]]; then
     info "Clonando ${GIT_REPO} → ${INSTALL_DIR}..."
     mkdir -p "$(dirname "$INSTALL_DIR")"
     git clone --branch "$GIT_BRANCH" "$GIT_REPO" "$INSTALL_DIR"
-    chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR/.git"
+    chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
     ok "Repositório clonado"
   fi
 elif [[ -d "$INSTALL_DIR/.git" ]]; then
@@ -183,6 +183,15 @@ if [[ ! -f .env ]]; then
 else
   ok ".env já existe — mantido"
 fi
+
+# ── Permissões ────────────────────────────────────────────────────────────────
+info "Ajustando permissões em ${INSTALL_DIR} para ${SERVICE_USER}..."
+chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+PARENT_DIR="$(dirname "$INSTALL_DIR")"
+if [[ "$PARENT_DIR" == /home/* && -d "$PARENT_DIR" ]]; then
+  chmod o+x "$PARENT_DIR" 2>/dev/null || true
+fi
+ok "Permissões ok"
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 NPM_CACHE="${INSTALL_DIR}/.npm-cache"
