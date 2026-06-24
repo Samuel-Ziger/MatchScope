@@ -1,0 +1,20 @@
+# The Odds API — 4 atualizações/dia (horário da VPS)
+# Ajuste o caminho e defina TZ se necessário (ex.: America/Sao_Paulo)
+#
+# crontab -e
+# TZ=America/Sao_Paulo
+
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+
+0 8 * * * cd /var/www/matchscope && /usr/bin/node server/fetch-odds.mjs morning >> /var/log/matchscope-odds.log 2>&1
+0 14 * * * cd /var/www/matchscope && /usr/bin/node server/fetch-odds.mjs afternoon >> /var/log/matchscope-odds.log 2>&1
+0 20 * * * cd /var/www/matchscope && /usr/bin/node server/fetch-odds.mjs evening >> /var/log/matchscope-odds.log 2>&1
+0 2 * * * cd /var/www/matchscope && /usr/bin/node server/fetch-odds.mjs night >> /var/log/matchscope-odds.log 2>&1
+
+# openfootball/worldcup.json — placares da Copa (git pull no repositório de dados)
+*/10 * * * * cd /var/www/matchscope && /usr/bin/node server/pull-worldcup.mjs >> /var/log/matchscope-worldcup.log 2>&1
+
+# MatchScope — deploy do seu repositório GitHub (só se instalou com GIT_REPO ou clone git)
+# Instalado automaticamente em /etc/cron.d/matchscope-deploy pelo install.sh
+# Teste manual: sudo bash /var/www/matchscope/deploy/update.sh

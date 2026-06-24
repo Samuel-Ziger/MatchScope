@@ -1,0 +1,16 @@
+[Unit]
+Description=MatchScope
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/matchscope
+EnvironmentFile=/var/www/matchscope/.env
+Environment=PORT=3000
+ExecStart=/usr/bin/node server/index.mjs
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

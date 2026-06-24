@@ -1,0 +1,650 @@
+[
+  {
+    "id": "A1",
+    "group": "A",
+    "matchday": 1,
+    "homeId": "mex",
+    "awayId": "rsa",
+    "date": "2026-06-11",
+    "venue": "Estadio Azteca"
+  },
+  {
+    "id": "A2",
+    "group": "A",
+    "matchday": 1,
+    "homeId": "kor",
+    "awayId": "cze",
+    "date": "2026-06-11",
+    "venue": "Estadio Akron"
+  },
+  {
+    "id": "A3",
+    "group": "A",
+    "matchday": 2,
+    "homeId": "cze",
+    "awayId": "rsa",
+    "date": "2026-06-18",
+    "venue": "Mercedes-Benz Stadium"
+  },
+  {
+    "id": "A4",
+    "group": "A",
+    "matchday": 2,
+    "homeId": "mex",
+    "awayId": "kor",
+    "date": "2026-06-18",
+    "venue": "Estadio Akron"
+  },
+  {
+    "id": "A5",
+    "group": "A",
+    "matchday": 3,
+    "homeId": "cze",
+    "awayId": "mex",
+    "date": "2026-06-24",
+    "venue": "Estadio Azteca"
+  },
+  {
+    "id": "A6",
+    "group": "A",
+    "matchday": 3,
+    "homeId": "rsa",
+    "awayId": "kor",
+    "date": "2026-06-24",
+    "venue": "Estadio BBVA"
+  },
+  {
+    "id": "B1",
+    "group": "B",
+    "matchday": 1,
+    "homeId": "can",
+    "awayId": "bih",
+    "date": "2026-06-12",
+    "venue": "BMO Field"
+  },
+  {
+    "id": "B2",
+    "group": "B",
+    "matchday": 1,
+    "homeId": "qat",
+    "awayId": "sui",
+    "date": "2026-06-13",
+    "venue": "Levi's Stadium"
+  },
+  {
+    "id": "B3",
+    "group": "B",
+    "matchday": 2,
+    "homeId": "sui",
+    "awayId": "bih",
+    "date": "2026-06-18",
+    "venue": "SoFi Stadium"
+  },
+  {
+    "id": "B4",
+    "group": "B",
+    "matchday": 2,
+    "homeId": "can",
+    "awayId": "qat",
+    "date": "2026-06-18",
+    "venue": "BC Place"
+  },
+  {
+    "id": "B5",
+    "group": "B",
+    "matchday": 3,
+    "homeId": "sui",
+    "awayId": "can",
+    "date": "2026-06-24",
+    "venue": "BC Place"
+  },
+  {
+    "id": "B6",
+    "group": "B",
+    "matchday": 3,
+    "homeId": "bih",
+    "awayId": "qat",
+    "date": "2026-06-24",
+    "venue": "Lumen Field"
+  },
+  {
+    "id": "C1",
+    "group": "C",
+    "matchday": 1,
+    "homeId": "bra",
+    "awayId": "mar",
+    "date": "2026-06-13",
+    "venue": "MetLife Stadium"
+  },
+  {
+    "id": "C2",
+    "group": "C",
+    "matchday": 1,
+    "homeId": "hti",
+    "awayId": "sco",
+    "date": "2026-06-13",
+    "venue": "Gillette Stadium"
+  },
+  {
+    "id": "C3",
+    "group": "C",
+    "matchday": 2,
+    "homeId": "sco",
+    "awayId": "mar",
+    "date": "2026-06-19",
+    "venue": "Gillette Stadium"
+  },
+  {
+    "id": "C4",
+    "group": "C",
+    "matchday": 2,
+    "homeId": "bra",
+    "awayId": "hti",
+    "date": "2026-06-19",
+    "venue": "Lincoln Financial Field"
+  },
+  {
+    "id": "C5",
+    "group": "C",
+    "matchday": 3,
+    "homeId": "sco",
+    "awayId": "bra",
+    "date": "2026-06-24",
+    "venue": "Hard Rock Stadium"
+  },
+  {
+    "id": "C6",
+    "group": "C",
+    "matchday": 3,
+    "homeId": "mar",
+    "awayId": "hti",
+    "date": "2026-06-24",
+    "venue": "Mercedes-Benz Stadium"
+  },
+  {
+    "id": "D1",
+    "group": "D",
+    "matchday": 1,
+    "homeId": "usa",
+    "awayId": "par",
+    "date": "2026-06-12",
+    "venue": "SoFi Stadium"
+  },
+  {
+    "id": "D2",
+    "group": "D",
+    "matchday": 1,
+    "homeId": "aus",
+    "awayId": "tur",
+    "date": "2026-06-13",
+    "venue": "BC Place"
+  },
+  {
+    "id": "D3",
+    "group": "D",
+    "matchday": 2,
+    "homeId": "usa",
+    "awayId": "aus",
+    "date": "2026-06-19",
+    "venue": "Lumen Field"
+  },
+  {
+    "id": "D4",
+    "group": "D",
+    "matchday": 2,
+    "homeId": "tur",
+    "awayId": "par",
+    "date": "2026-06-19",
+    "venue": "Levi's Stadium"
+  },
+  {
+    "id": "D5",
+    "group": "D",
+    "matchday": 3,
+    "homeId": "tur",
+    "awayId": "usa",
+    "date": "2026-06-25",
+    "venue": "SoFi Stadium"
+  },
+  {
+    "id": "D6",
+    "group": "D",
+    "matchday": 3,
+    "homeId": "par",
+    "awayId": "aus",
+    "date": "2026-06-25",
+    "venue": "Levi's Stadium"
+  },
+  {
+    "id": "E1",
+    "group": "E",
+    "matchday": 1,
+    "homeId": "ger",
+    "awayId": "cuw",
+    "date": "2026-06-14",
+    "venue": "NRG Stadium"
+  },
+  {
+    "id": "E2",
+    "group": "E",
+    "matchday": 1,
+    "homeId": "civ",
+    "awayId": "ecu",
+    "date": "2026-06-14",
+    "venue": "Lincoln Financial Field"
+  },
+  {
+    "id": "E3",
+    "group": "E",
+    "matchday": 2,
+    "homeId": "ger",
+    "awayId": "civ",
+    "date": "2026-06-20",
+    "venue": "BMO Field"
+  },
+  {
+    "id": "E4",
+    "group": "E",
+    "matchday": 2,
+    "homeId": "ecu",
+    "awayId": "cuw",
+    "date": "2026-06-20",
+    "venue": "Arrowhead Stadium"
+  },
+  {
+    "id": "E5",
+    "group": "E",
+    "matchday": 3,
+    "homeId": "cuw",
+    "awayId": "civ",
+    "date": "2026-06-25",
+    "venue": "Lincoln Financial Field"
+  },
+  {
+    "id": "E6",
+    "group": "E",
+    "matchday": 3,
+    "homeId": "ecu",
+    "awayId": "ger",
+    "date": "2026-06-25",
+    "venue": "MetLife Stadium"
+  },
+  {
+    "id": "F1",
+    "group": "F",
+    "matchday": 1,
+    "homeId": "ned",
+    "awayId": "jpn",
+    "date": "2026-06-14",
+    "venue": "AT&T Stadium"
+  },
+  {
+    "id": "F2",
+    "group": "F",
+    "matchday": 1,
+    "homeId": "swe",
+    "awayId": "tun",
+    "date": "2026-06-14",
+    "venue": "Estadio BBVA"
+  },
+  {
+    "id": "F3",
+    "group": "F",
+    "matchday": 2,
+    "homeId": "ned",
+    "awayId": "swe",
+    "date": "2026-06-20",
+    "venue": "NRG Stadium"
+  },
+  {
+    "id": "F4",
+    "group": "F",
+    "matchday": 2,
+    "homeId": "tun",
+    "awayId": "jpn",
+    "date": "2026-06-21",
+    "venue": "Estadio BBVA"
+  },
+  {
+    "id": "F5",
+    "group": "F",
+    "matchday": 3,
+    "homeId": "jpn",
+    "awayId": "swe",
+    "date": "2026-06-25",
+    "venue": "AT&T Stadium"
+  },
+  {
+    "id": "F6",
+    "group": "F",
+    "matchday": 3,
+    "homeId": "tun",
+    "awayId": "ned",
+    "date": "2026-06-25",
+    "venue": "Arrowhead Stadium"
+  },
+  {
+    "id": "G1",
+    "group": "G",
+    "matchday": 1,
+    "homeId": "bel",
+    "awayId": "egy",
+    "date": "2026-06-15",
+    "venue": "Lumen Field"
+  },
+  {
+    "id": "G2",
+    "group": "G",
+    "matchday": 1,
+    "homeId": "irn",
+    "awayId": "nzl",
+    "date": "2026-06-15",
+    "venue": "SoFi Stadium"
+  },
+  {
+    "id": "G3",
+    "group": "G",
+    "matchday": 2,
+    "homeId": "bel",
+    "awayId": "irn",
+    "date": "2026-06-21",
+    "venue": "SoFi Stadium"
+  },
+  {
+    "id": "G4",
+    "group": "G",
+    "matchday": 2,
+    "homeId": "nzl",
+    "awayId": "egy",
+    "date": "2026-06-21",
+    "venue": "BC Place"
+  },
+  {
+    "id": "G5",
+    "group": "G",
+    "matchday": 3,
+    "homeId": "egy",
+    "awayId": "irn",
+    "date": "2026-06-26",
+    "venue": "Lumen Field"
+  },
+  {
+    "id": "G6",
+    "group": "G",
+    "matchday": 3,
+    "homeId": "nzl",
+    "awayId": "bel",
+    "date": "2026-06-26",
+    "venue": "BC Place"
+  },
+  {
+    "id": "H1",
+    "group": "H",
+    "matchday": 1,
+    "homeId": "esp",
+    "awayId": "cpv",
+    "date": "2026-06-15",
+    "venue": "Mercedes-Benz Stadium"
+  },
+  {
+    "id": "H2",
+    "group": "H",
+    "matchday": 1,
+    "homeId": "ksa",
+    "awayId": "uru",
+    "date": "2026-06-15",
+    "venue": "Hard Rock Stadium"
+  },
+  {
+    "id": "H3",
+    "group": "H",
+    "matchday": 2,
+    "homeId": "esp",
+    "awayId": "ksa",
+    "date": "2026-06-21",
+    "venue": "Mercedes-Benz Stadium"
+  },
+  {
+    "id": "H4",
+    "group": "H",
+    "matchday": 2,
+    "homeId": "uru",
+    "awayId": "cpv",
+    "date": "2026-06-21",
+    "venue": "Hard Rock Stadium"
+  },
+  {
+    "id": "H5",
+    "group": "H",
+    "matchday": 3,
+    "homeId": "cpv",
+    "awayId": "ksa",
+    "date": "2026-06-26",
+    "venue": "NRG Stadium"
+  },
+  {
+    "id": "H6",
+    "group": "H",
+    "matchday": 3,
+    "homeId": "uru",
+    "awayId": "esp",
+    "date": "2026-06-26",
+    "venue": "Estadio Akron"
+  },
+  {
+    "id": "I1",
+    "group": "I",
+    "matchday": 1,
+    "homeId": "fra",
+    "awayId": "sen",
+    "date": "2026-06-16",
+    "venue": "MetLife Stadium"
+  },
+  {
+    "id": "I2",
+    "group": "I",
+    "matchday": 1,
+    "homeId": "irq",
+    "awayId": "nor",
+    "date": "2026-06-16",
+    "venue": "Gillette Stadium"
+  },
+  {
+    "id": "I3",
+    "group": "I",
+    "matchday": 2,
+    "homeId": "fra",
+    "awayId": "irq",
+    "date": "2026-06-22",
+    "venue": "Lincoln Financial Field"
+  },
+  {
+    "id": "I4",
+    "group": "I",
+    "matchday": 2,
+    "homeId": "nor",
+    "awayId": "sen",
+    "date": "2026-06-22",
+    "venue": "MetLife Stadium"
+  },
+  {
+    "id": "I5",
+    "group": "I",
+    "matchday": 3,
+    "homeId": "nor",
+    "awayId": "fra",
+    "date": "2026-06-26",
+    "venue": "Gillette Stadium"
+  },
+  {
+    "id": "I6",
+    "group": "I",
+    "matchday": 3,
+    "homeId": "sen",
+    "awayId": "irq",
+    "date": "2026-06-26",
+    "venue": "BMO Field"
+  },
+  {
+    "id": "J1",
+    "group": "J",
+    "matchday": 1,
+    "homeId": "arg",
+    "awayId": "alg",
+    "date": "2026-06-16",
+    "venue": "Arrowhead Stadium"
+  },
+  {
+    "id": "J2",
+    "group": "J",
+    "matchday": 1,
+    "homeId": "aut",
+    "awayId": "jor",
+    "date": "2026-06-16",
+    "venue": "Levi's Stadium"
+  },
+  {
+    "id": "J3",
+    "group": "J",
+    "matchday": 2,
+    "homeId": "arg",
+    "awayId": "aut",
+    "date": "2026-06-22",
+    "venue": "AT&T Stadium"
+  },
+  {
+    "id": "J4",
+    "group": "J",
+    "matchday": 2,
+    "homeId": "jor",
+    "awayId": "alg",
+    "date": "2026-06-22",
+    "venue": "Levi's Stadium"
+  },
+  {
+    "id": "J5",
+    "group": "J",
+    "matchday": 3,
+    "homeId": "alg",
+    "awayId": "aut",
+    "date": "2026-06-27",
+    "venue": "Arrowhead Stadium"
+  },
+  {
+    "id": "J6",
+    "group": "J",
+    "matchday": 3,
+    "homeId": "jor",
+    "awayId": "arg",
+    "date": "2026-06-27",
+    "venue": "AT&T Stadium"
+  },
+  {
+    "id": "K1",
+    "group": "K",
+    "matchday": 1,
+    "homeId": "por",
+    "awayId": "cod",
+    "date": "2026-06-17",
+    "venue": "NRG Stadium"
+  },
+  {
+    "id": "K2",
+    "group": "K",
+    "matchday": 1,
+    "homeId": "uzb",
+    "awayId": "col",
+    "date": "2026-06-17",
+    "venue": "Estadio Azteca"
+  },
+  {
+    "id": "K3",
+    "group": "K",
+    "matchday": 2,
+    "homeId": "por",
+    "awayId": "uzb",
+    "date": "2026-06-23",
+    "venue": "NRG Stadium"
+  },
+  {
+    "id": "K4",
+    "group": "K",
+    "matchday": 2,
+    "homeId": "col",
+    "awayId": "cod",
+    "date": "2026-06-23",
+    "venue": "Estadio Akron"
+  },
+  {
+    "id": "K5",
+    "group": "K",
+    "matchday": 3,
+    "homeId": "col",
+    "awayId": "por",
+    "date": "2026-06-27",
+    "venue": "Hard Rock Stadium"
+  },
+  {
+    "id": "K6",
+    "group": "K",
+    "matchday": 3,
+    "homeId": "cod",
+    "awayId": "uzb",
+    "date": "2026-06-27",
+    "venue": "Mercedes-Benz Stadium"
+  },
+  {
+    "id": "L1",
+    "group": "L",
+    "matchday": 1,
+    "homeId": "eng",
+    "awayId": "cro",
+    "date": "2026-06-17",
+    "venue": "AT&T Stadium"
+  },
+  {
+    "id": "L2",
+    "group": "L",
+    "matchday": 1,
+    "homeId": "gha",
+    "awayId": "pan",
+    "date": "2026-06-17",
+    "venue": "BMO Field"
+  },
+  {
+    "id": "L3",
+    "group": "L",
+    "matchday": 2,
+    "homeId": "eng",
+    "awayId": "gha",
+    "date": "2026-06-23",
+    "venue": "Gillette Stadium"
+  },
+  {
+    "id": "L4",
+    "group": "L",
+    "matchday": 2,
+    "homeId": "pan",
+    "awayId": "cro",
+    "date": "2026-06-23",
+    "venue": "BMO Field"
+  },
+  {
+    "id": "L5",
+    "group": "L",
+    "matchday": 3,
+    "homeId": "pan",
+    "awayId": "eng",
+    "date": "2026-06-27",
+    "venue": "MetLife Stadium"
+  },
+  {
+    "id": "L6",
+    "group": "L",
+    "matchday": 3,
+    "homeId": "cro",
+    "awayId": "gha",
+    "date": "2026-06-27",
+    "venue": "Lincoln Financial Field"
+  }
+]

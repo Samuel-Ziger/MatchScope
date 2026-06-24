@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.env.local
+tmp-*.json
+data/openfootball-worldcup/
+data/odds.json
+data/votes.json
+data/matches-sync.json
+data/worldcup-2026.json
+.npm-cache/
