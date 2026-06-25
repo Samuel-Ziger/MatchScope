@@ -83,6 +83,23 @@ async function proxyApiFootball(reqPath, req, res) {
   }
 }
 
+async function proxyWorldCup26(reqPath, res) {
+  const path = reqPath.replace(/^\/api\/worldcup26/, '')
+  const url = `https://worldcup26.ir${path}`
+
+  try {
+    const upstream = await fetch(url)
+    const body = await upstream.text()
+    res.writeHead(upstream.status, {
+      'Content-Type': upstream.headers.get('content-type') ?? 'application/json',
+      'Cache-Control': 'no-cache',
+    })
+    res.end(body)
+  } catch {
+    sendJson(res, 502, { message: 'Erro ao contactar worldcup26.ir' })
+  }
+}
+
 function serveDataJson(res, filePath, emptyBody) {
   const body = existsSync(filePath) ? readFileSync(filePath, 'utf8') : emptyBody
   res.writeHead(200, {
@@ -126,6 +143,11 @@ createServer(async (req, res) => {
 
   if (url.pathname.startsWith('/api/football-data')) {
     await proxyFootballData(url.pathname + url.search, res)
+    return
+  }
+
+  if (url.pathname.startsWith('/api/worldcup26')) {
+    await proxyWorldCup26(url.pathname + url.search, res)
     return
   }
 

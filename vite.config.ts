@@ -140,6 +140,35 @@ function theOddsApiProxyPlugin(apiKey: string): Plugin {
   }
 }
 
+function worldCup26ProxyPlugin(): Plugin {
+  const handler = async (req: import('node:http').IncomingMessage, res: import('node:http').ServerResponse, next: () => void) => {
+    if (!req.url?.startsWith('/api/worldcup26')) return next()
+
+    const path = req.url.replace(/^\/api\/worldcup26/, '')
+    try {
+      const upstream = await fetch(`https://worldcup26.ir${path}`)
+      const body = await upstream.text()
+      res.statusCode = upstream.status
+      res.setHeader('Content-Type', upstream.headers.get('content-type') ?? 'application/json')
+      res.setHeader('Cache-Control', 'no-cache')
+      res.end(body)
+    } catch {
+      res.statusCode = 502
+      res.end(JSON.stringify({ message: 'Erro ao contactar worldcup26.ir' }))
+    }
+  }
+
+  return {
+    name: 'worldcup26-proxy',
+    configureServer(server) {
+      server.middlewares.use(handler)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(handler)
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '')
   const apiFootballKey = env.API_FOOTBALL_KEY
@@ -164,6 +193,7 @@ export default defineConfig(({ mode }) => {
       votesApiPlugin(),
       footballDataProxyPlugin(env.FOOTBALL_DATA_TOKEN ?? ''),
       theOddsApiProxyPlugin(env.THE_ODDS_API_KEY ?? ''),
+      worldCup26ProxyPlugin(),
     ],
     server: {
       proxy: {

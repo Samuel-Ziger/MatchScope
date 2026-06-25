@@ -14,7 +14,7 @@ export interface ApiFixtureItem {
   fixture: {
     id: number
     date: string
-    status: { short: string; long: string }
+    status: { short: string; long: string; elapsed?: number | null; extra?: number | null }
   }
   league: { id: number; name: string; season: number; round?: string }
   teams: { home: ApiTeam; away: ApiTeam }

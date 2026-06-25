@@ -144,7 +144,7 @@ export function OverviewPanel({ teams }: OverviewPanelProps) {
           <div className="border-l-2 border-positive pl-3">
             <div className="text-text-tertiary text-xs mb-1">Mercado</div>
             <div className="text-text-primary">
-              Odds agregadas (Kalshi + Polymarket) na aba Probabilidades — reflete apostas, não o caminho da chave
+              Odds agregadas (Kalshi + Polymarket) aparecem como comparação — refletem apostas, não o caminho da chave
             </div>
           </div>
           <div className="border-l-2 border-warning pl-3">

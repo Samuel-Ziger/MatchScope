@@ -69,8 +69,8 @@ export function MethodologyPanel() {
         />
         <dl className="space-y-4 text-sm">
           <MetricDef
-            term="Probabilidade agregada (Título)"
-            definition="Média das probabilidades implícitas de múltiplas casas esportivas (regiões US e EU), obtidas via The Odds API no mercado outrights. Convertida de odds decimais: prob% = 100 / odd."
+            term="Probabilidade de título (modelo)"
+            definition="Monte Carlo da chave completa: projeta grupos, aplica o template FIFA dos 32 avos e simula o mata-mata com Elo e forma recente. É a métrica usada em Visão Geral, Mapa / Chaves e Probabilidades."
           />
           <MetricDef
             term="Momentum 24h"
@@ -78,7 +78,7 @@ export function MethodologyPanel() {
           />
           <MetricDef
             term="Prob. Oitavas (R16)"
-            definition="Probabilidade de avançar às oitavas de final (Round of 16), conforme dados estáticos de mercado compilados em junho/2026. Diferente da prob. de título — mede apenas classificação no mata-mata."
+            definition="No modo modelo, mede a frequência com que a seleção chega às oitavas nas simulações da chave. Em comparativos de mercado, pode aparecer como referência externa de classificação."
           />
           <MetricDef
             term="Rating Elo"
@@ -98,7 +98,7 @@ export function MethodologyPanel() {
           />
           <MetricDef
             term="Simulação Monte Carlo"
-            definition="Engine proprietária que simula torneios eliminatórios usando Elo como base, com parâmetros ajustáveis de aleatoriedade e blend com dados de mercado. Não substitui as probabilidades dos mercados — é uma ferramenta analítica complementar."
+            definition="Engine que simula a Copa inteira usando caminho real da chave, Elo, forma dos jogos já disputados e amostragem aleatória. As odds de Kalshi/Polymarket ficam como comparação, não como critério para escolher o campeão projetado."
           />
         </dl>
       </Card>

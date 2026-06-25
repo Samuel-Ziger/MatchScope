@@ -14,6 +14,16 @@ export interface FdoMatch {
   score: {
     fullTime: { home: number | null; away: number | null }
   }
+  minute?: number | null
+  lastUpdated?: string
+  goals?: {
+    minute: number | null
+    extraTime: number | null
+    type: string
+    team: { id: number; name: string }
+    scorer: { id: number; name: string } | null
+    assist: { id: number; name: string } | null
+  }[]
 }
 
 export interface FdoMatchesResponse {

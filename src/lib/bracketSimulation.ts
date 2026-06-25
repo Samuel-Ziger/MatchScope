@@ -1,6 +1,7 @@
 import type { Team } from '../data/teams'
 import type { TournamentMatch, MatchStage } from '../data/matches'
 import { getKnockoutWinProbability, getMatchProbabilitiesWithForm } from './simulation'
+import type { SimulationResult } from './simulation'
 import {
   computeGroupStandings,
   rankThirdPlaces,
@@ -35,6 +36,7 @@ export interface SimulatedBracket {
   championId: string | null
   championProb: number
   championProbabilities: { teamId: string; prob: number }[]
+  simulationResults: SimulationResult[]
 }
 
 function isPlayed(m: TournamentMatch): boolean {
@@ -268,10 +270,56 @@ export function buildSimulatedBracket(
   const championId = final?.projectedWinnerId ?? null
   const championProb = final?.winnerAdvanceProb ?? 0
 
-  return { rounds, championId, championProb, championProbabilities: [] }
+  return { rounds, championId, championProb, championProbabilities: [], simulationResults: [] }
 }
 
-export const BRACKET_MC_ITERATIONS = 5000
+export const BRACKET_MC_ITERATIONS = 10000
+
+function addTeamCount(counts: Record<string, number>, teamId: string) {
+  if (teamId !== 'tbd') counts[teamId] = (counts[teamId] || 0) + 1
+}
+
+function addRoundEntrants(counts: Record<string, number>, matches: SimulatedMatch[] | undefined) {
+  if (!matches) return
+  for (const match of matches) {
+    addTeamCount(counts, match.homeId)
+    addTeamCount(counts, match.awayId)
+  }
+}
+
+export function runBracketMonteCarloResults(
+  matches: TournamentMatch[],
+  teams: Team[],
+  perfMap: Map<string, MatchPerformance>,
+  formCache: Map<string, number>,
+  iterations = BRACKET_MC_ITERATIONS,
+): SimulationResult[] {
+  const wins: Record<string, number> = {}
+  const semis: Record<string, number> = {}
+  const quarters: Record<string, number> = {}
+  const roundOf16: Record<string, number> = {}
+
+  for (let i = 0; i < iterations; i++) {
+    const bracket = buildSimulatedBracket(matches, teams, perfMap, new Map(formCache), true)
+    const roundsByStage = Object.fromEntries(bracket.rounds.map((round) => [round.stage, round.matches]))
+
+    addRoundEntrants(roundOf16, roundsByStage.r16)
+    addRoundEntrants(quarters, roundsByStage.qf)
+    addRoundEntrants(semis, roundsByStage.sf)
+
+    if (bracket.championId) addTeamCount(wins, bracket.championId)
+  }
+
+  return teams
+    .map((team) => ({
+      teamId: team.id,
+      winProb: ((wins[team.id] || 0) / iterations) * 100,
+      semifinalProb: ((semis[team.id] || 0) / iterations) * 100,
+      quarterfinalProb: ((quarters[team.id] || 0) / iterations) * 100,
+      roundOf16Prob: ((roundOf16[team.id] || 0) / iterations) * 100,
+    }))
+    .sort((a, b) => b.winProb - a.winProb)
+}
 
 export function runBracketMonteCarlo(
   matches: TournamentMatch[],
@@ -280,17 +328,9 @@ export function runBracketMonteCarlo(
   formCache: Map<string, number>,
   iterations = BRACKET_MC_ITERATIONS,
 ): { teamId: string; prob: number }[] {
-  const counts: Record<string, number> = {}
-
-  for (let i = 0; i < iterations; i++) {
-    const bracket = buildSimulatedBracket(matches, teams, perfMap, new Map(formCache), true)
-    const champ = bracket.championId
-    if (champ) counts[champ] = (counts[champ] || 0) + 1
-  }
-
-  return Object.entries(counts)
-    .map(([teamId, c]) => ({ teamId, prob: (c / iterations) * 100 }))
-    .sort((a, b) => b.prob - a.prob)
+  return runBracketMonteCarloResults(matches, teams, perfMap, formCache, iterations)
+    .filter((result) => result.winProb > 0)
+    .map((result) => ({ teamId: result.teamId, prob: result.winProb }))
 }
 
 export function buildFullSimulatedBracket(
@@ -300,12 +340,16 @@ export function buildFullSimulatedBracket(
   formCache: Map<string, number>,
 ): SimulatedBracket {
   const deterministic = buildSimulatedBracket(matches, teams, perfMap, formCache, false)
-  const championProbabilities = runBracketMonteCarlo(matches, teams, perfMap, formCache)
+  const simulationResults = runBracketMonteCarloResults(matches, teams, perfMap, formCache)
+  const championProbabilities = simulationResults
+    .filter((result) => result.winProb > 0)
+    .map((result) => ({ teamId: result.teamId, prob: result.winProb }))
   const top = championProbabilities[0]
   return {
     ...deterministic,
     championId: top?.teamId ?? deterministic.championId,
     championProb: top?.prob ?? deterministic.championProb,
     championProbabilities,
+    simulationResults,
   }
 }

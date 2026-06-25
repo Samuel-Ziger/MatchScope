@@ -7,12 +7,18 @@ import { Flag, Badge } from './ui'
 interface TeamTableProps {
   teams: Team[]
   simulationMap?: Map<string, number>
+  simulationRoundOf16Map?: Map<string, number>
   mode?: 'market' | 'simulation'
 }
 
 type SortKey = 'aggregate' | 'kalshi' | 'polymarket' | 'elo' | 'reachR16' | 'momentum'
 
-export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTableProps) {
+export function TeamTable({
+  teams,
+  simulationMap,
+  simulationRoundOf16Map,
+  mode = 'market',
+}: TeamTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('aggregate')
   const [sortAsc, setSortAsc] = useState(false)
   const [filter, setFilter] = useState('')
@@ -36,12 +42,20 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
         case 'kalshi': va = a.market.kalshi; vb = b.market.kalshi; break
         case 'polymarket': va = a.market.polymarket; vb = b.market.polymarket; break
         case 'elo': va = a.elo; vb = b.elo; break
-        case 'reachR16': va = a.tournament.reachR16; vb = b.tournament.reachR16; break
+        case 'reachR16':
+          if (mode === 'simulation' && simulationRoundOf16Map) {
+            va = simulationRoundOf16Map.get(a.id) ?? 0
+            vb = simulationRoundOf16Map.get(b.id) ?? 0
+          } else {
+            va = a.tournament.reachR16
+            vb = b.tournament.reachR16
+          }
+          break
         case 'momentum': va = a.market.momentum24h; vb = b.market.momentum24h; break
         default:
           if (mode === 'simulation' && simulationMap) {
-            va = simulationMap.get(a.id) ?? a.market.aggregate
-            vb = simulationMap.get(b.id) ?? b.market.aggregate
+            va = simulationMap.get(a.id) ?? 0
+            vb = simulationMap.get(b.id) ?? 0
           } else {
             va = a.market.aggregate
             vb = b.market.aggregate
@@ -51,7 +65,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
     })
 
     return list
-  }, [teams, sortKey, sortAsc, filter, confedFilter, mode, simulationMap])
+  }, [teams, sortKey, sortAsc, filter, confedFilter, mode, simulationMap, simulationRoundOf16Map])
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortAsc(!sortAsc)
@@ -98,7 +112,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3 w-10">#</th>
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3">Seleção</th>
                 <th className="text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3">Grp</th>
-                <Th label="Título (mix)" sort="aggregate" />
+                <Th label={mode === 'simulation' ? 'Título (modelo)' : 'Título (mix)'} sort="aggregate" />
                 <th className="hidden md:table-cell text-left text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-4 py-3 cursor-pointer hover:text-text-secondary select-none whitespace-nowrap" onClick={() => toggleSort('kalshi')}>
                   Kalshi{sortKey === 'kalshi' && <span className="ml-1 text-brand">{sortAsc ? '↑' : '↓'}</span>}
                 </th>
@@ -117,8 +131,11 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
             <tbody>
               {sorted.map((team, i) => {
                 const prob = mode === 'simulation' && simulationMap
-                  ? simulationMap.get(team.id) ?? team.market.aggregate
+                  ? simulationMap.get(team.id) ?? 0
                   : team.market.aggregate
+                const r16Prob = mode === 'simulation' && simulationRoundOf16Map
+                  ? simulationRoundOf16Map.get(team.id) ?? 0
+                  : team.tournament.reachR16
 
                 return (
                   <tr
@@ -157,7 +174,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
                         <span className="text-xs font-mono text-text-tertiary">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm font-mono text-text-secondary hidden sm:table-cell">{formatPct(team.tournament.reachR16)}</td>
+                    <td className="px-4 py-3 text-sm font-mono text-text-secondary hidden sm:table-cell">{formatPct(r16Prob)}</td>
                     <td className="px-4 py-3 text-sm font-mono text-text-secondary">{team.elo}</td>
                     <td className="px-4 py-3 text-xs font-mono text-text-tertiary hidden lg:table-cell">
                       {getSquadByTeamId(team.id)?.players.length ?? '—'}
@@ -174,7 +191,7 @@ export function TeamTable({ teams, simulationMap, mode = 'market' }: TeamTablePr
       </div>
 
       <p className="text-xs text-text-tertiary mt-3">
-        {sorted.length} seleções · Título: média Odds API + Kalshi + Polymarket · Grupo/oitavas: referência DeFi Rate
+        {sorted.length} seleções · Título: {mode === 'simulation' ? 'modelo da chave (Elo + forma + Monte Carlo)' : 'média Odds API + Kalshi + Polymarket'} · Grupo/oitavas: referência DeFi Rate
         <span className="md:hidden"> · deslize a tabela para ver mais colunas</span>
       </p>
     </div>

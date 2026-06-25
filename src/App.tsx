@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { DATA_LAST_UPDATED } from './data/teams'
 import { Header } from './components/Header'
 import { OverviewPanel } from './components/OverviewPanel'
@@ -7,16 +7,26 @@ import { SimulationPanel } from './components/SimulationPanel'
 import { HeadToHead } from './components/HeadToHead'
 import { ChartsPanel } from './components/ChartsPanel'
 import { MethodologyPanel } from './components/MethodologyPanel'
-import { TournamentProvider } from './context/TournamentContext'
+import { TournamentProvider, useTournament } from './context/TournamentContext'
 import { useTeams } from './context/TeamsContext'
 import { TeamsPanel } from './components/TeamsPanel'
 import { BracketMap } from './components/BracketMap'
 import { VoteMapPanel } from './components/VoteMapPanel'
+import { NowPanel } from './components/NowPanel'
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('overview')
   const { teams, getContenders, oddsLastUpdated } = useTeams()
+  const { state } = useTournament()
   const contenders = getContenders(0.05)
+  const modelTitleMap = useMemo(
+    () => new Map(state.simulatedBracket.simulationResults.map((r) => [r.teamId, r.winProb])),
+    [state.simulatedBracket.simulationResults],
+  )
+  const modelRoundOf16Map = useMemo(
+    () => new Map(state.simulatedBracket.simulationResults.map((r) => [r.teamId, r.roundOf16Prob])),
+    [state.simulatedBracket.simulationResults],
+  )
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-clip max-w-full">
@@ -24,6 +34,8 @@ function AppContent() {
 
       <main className="flex-1 w-full min-w-0 max-w-[1400px] mx-auto px-4 sm:px-6 py-6 overflow-x-clip">
         {activeTab === 'overview' && <OverviewPanel teams={contenders} />}
+
+        {activeTab === 'agora' && <NowPanel />}
 
         {activeTab === 'selecoes' && <TeamsPanel />}
 
@@ -36,10 +48,15 @@ function AppContent() {
             <div>
               <h2 className="text-xl font-semibold text-text-primary tracking-tight">Tabela de Probabilidades</h2>
               <p className="text-sm text-text-secondary mt-1">
-                Probabilidades de título via casas esportivas (The Odds API) + Elo.
+                Probabilidades de título pelo mesmo modelo da Visão Geral e do Mapa / Chaves.
               </p>
             </div>
-            <TeamTable teams={teams} />
+            <TeamTable
+              teams={teams}
+              simulationMap={modelTitleMap}
+              simulationRoundOf16Map={modelRoundOf16Map}
+              mode="simulation"
+            />
           </div>
         )}
 

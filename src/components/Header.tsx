@@ -5,6 +5,7 @@ interface HeaderProps {
 
 const TABS = [
   { id: 'overview', label: 'Visão Geral' },
+  { id: 'agora', label: 'Agora' },
   { id: 'selecoes', label: 'Seleções' },
   { id: 'mapa', label: 'Mapa / Chaves' },
   { id: 'voto', label: 'Voto Popular' },
